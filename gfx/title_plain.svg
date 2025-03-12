@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="144"
+   height="168"
+   viewBox="0 0 144 168"
+   version="1.1"
+   id="svg1"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
+  <g
+     id="layer1"
+     transform="translate(-3.5291672,-16.529167)"
+     style="fill:#ffff00;fill-opacity:1">
+    <circle
+       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.5;stroke-miterlimit:0;stroke-opacity:1"
+       id="path1-5"
+       cx="27.529167"
+       cy="40.529167"
+       r="24" />
+    <circle
+       style="fill:#ff0202;fill-opacity:1;stroke-width:1.3125;stroke-miterlimit:0"
+       id="path1"
+       cx="27.529167"
+       cy="40.529167"
+       r="21" />
+    <path
+       d="m 31.029153,43.329159 h 8.978265 V 56.529167 H 22.050888 V 34.529154 h 17.95653 v 4.400002 H 24.616107 V 52.129164 H 37.4422 v -4.400003 h -6.413047 z m 11.543465,0 h 15.39131 v 4.400002 H 42.572618 Z M 60.529167,56.529167 V 34.529154 h 15.391312 l 2.565218,4.400002 v 13.200008 l -2.565218,4.400003 z M 63.094386,43.329159 H 75.920479 V 38.929156 H 63.094386 Z m 0,8.800005 H 75.920479 V 47.729161 H 63.094386 Z m 20.521729,4.400003 H 81.050897 V 34.529154 H 99.00743 V 56.529167 H 96.442209 V 47.729161 H 83.616115 Z m 0,-13.200008 H 96.442209 V 38.929156 H 83.616115 Z m 17.956505,-8.800005 h 2.56522 v 17.60001 h 15.39131 v 4.400003 h -17.95653 z m 20.52174,0 h 2.56521 v 17.60001 h 15.39132 v 4.400003 h -17.95653 z"
+       id="text1-0"
+       style="-inkscape-font-specification:'Square Sans Serif 7, ';fill:#555555;fill-opacity:1;stroke:#555555;stroke-width:2;stroke-linecap:square;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       aria-label="G-ball" />
+    <path
+       d="m 30.029153,42.329159 h 8.978265 V 55.529167 H 21.050888 V 33.529154 h 17.95653 v 4.400002 H 23.616107 V 51.129164 H 36.4422 v -4.400003 h -6.413047 z m 11.543465,0 h 15.39131 v 4.400002 H 41.572618 Z M 59.529167,55.529167 V 33.529154 h 15.391312 l 2.565218,4.400002 v 13.200008 l -2.565218,4.400003 z M 62.094386,42.329159 H 74.920479 V 37.929156 H 62.094386 Z m 0,8.800005 H 74.920479 V 46.729161 H 62.094386 Z m 20.521729,4.400003 H 80.050897 V 33.529154 h 17.95653 V 55.529167 H 95.442209 V 46.729161 H 82.616115 Z m 0,-13.200008 H 95.442209 V 37.929156 H 82.616115 Z m 17.956505,-8.800005 h 2.56522 v 17.60001 h 15.39131 v 4.400003 h -17.95653 z m 20.52174,0 h 2.56521 v 17.60001 h 15.39132 v 4.400003 h -17.95653 z"
+       id="text1"
+       style="-inkscape-font-specification:'Square Sans Serif 7, ';fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:2;stroke-linecap:square;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
+       aria-label="G-ball" />
+  </g>
+</svg>

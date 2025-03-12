@@ -1,0 +1,60 @@
+{
+  "uuid": "79c30536-4453-4122-9505-496fd4cbb3e1",
+  "shortName": "G-Ball",
+  "longName": "G-Ball",
+  "companyName": "Loxo Software",
+  "versionCode": 1,
+  "versionLabel": "1.0",
+  "sdkVersion": "3",
+  "targetPlatforms": ["basalt"],
+  "watchapp": {
+    "watchface": false
+  },
+  "appKeys": {
+    "dummy": 0
+  },
+  "resources": {
+    "media": [
+      {
+        "name": "BMP_TITLE",
+        "type": "raw",
+        "file": "title.png"
+      },
+      {
+        "name": "PDC_SKULL",
+        "type": "raw",
+        "file": "skull.pdc"
+      },
+      {
+        "name": "PDC_WARNING",
+        "type": "raw",
+        "file": "warning.pdc"
+      },
+      {
+        "name": "PDC_LVL_1",
+        "type": "raw",
+        "file": "lvl1.pdc"
+      },
+      {
+        "name": "PDC_LVL_2",
+        "type": "raw",
+        "file": "lvl2.pdc"
+      },
+      {
+        "name": "PDC_LVL_3",
+        "type": "raw",
+        "file": "lvl3.pdc"
+      },
+      {
+        "name": "PDC_LVL_4",
+        "type": "raw",
+        "file": "lvl4.pdc"
+      },
+      {
+        "name": "PDC_LVL_5",
+        "type": "raw",
+        "file": "lvl5.pdc"
+      }
+    ]
+  }
+}
