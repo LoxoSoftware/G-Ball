@@ -9,6 +9,7 @@ enum entity_t
     ent_spawn, ent_end, ent_hole,
     ent_solidWall, ent_fragileWall,
     ent_decoration, ent_blaster,
+    ent_switch, ent_swblast
 };
 
 enum entity_angle_t
@@ -25,7 +26,8 @@ enum decoration_image_t
 
 typedef struct
 {
-    uint16_t        type;
+    uint8_t         type;
+    uint8_t         switchid;
     int16_t         x, y;
     union
     {
@@ -41,6 +43,7 @@ typedef struct
     union
     {
         uint32_t    state;
+        uint32_t    frames;
         uint32_t    image;
     };
 } level_elem_t;
@@ -128,6 +131,24 @@ level_elem_t lvl_5_elements[]=
     //{ .type=ent_blaster,    .x=40,.y=60 },
     { .type=ent_end,        .x=24,.y=32 },
 };
+level_elem_t lvl_6_elements[]=
+{
+    { .type=ent_spawn,      .x=24,.y=40},
+    { .type=ent_hole,       .x=100,.y=8,.w=16,.h=92 },
+    { .type=ent_hole,       .x=116,.y=146,.w=20,.h=16 },
+    { .type=ent_solidWall,  .x=8,.y=0,.w=64,.h=24 },
+    { .type=ent_solidWall,  .x=8,.y=60,.w=64,.h=8 },
+    { .type=ent_solidWall,  .x=46,.y=100,.w=36,.h=16 },
+    { .type=ent_solidWall,  .x=90,.y=100,.w=24,.h=16 },
+    { .type=ent_switch,     .x=76,.y=64,.w=20,.h=20,.switchid=0 },
+    { .type=ent_swblast,    .x=82,.y=0,.angle=angle_facingDown,.interval=15,.switchid=0 },
+    //Corners
+    { .type=ent_solidWall,  .x=0,.y=0,.w=8,.h=168 },
+    { .type=ent_solidWall,  .x=144-8,.y=0,.w=8,.h=168 },
+    { .type=ent_solidWall,  .x=70,.y=0,.w=70,.h=8 },
+    { .type=ent_solidWall,  .x=0,.y=168-8,.w=144,.h=8 },
+    { .type=ent_end,        .x=130,.y=24 },
+};
 level_elem_t lvl_debug_elements[]=
 {
     { .type=ent_spawn,      .x=32,.y=32 },
@@ -146,4 +167,5 @@ level_t levels[]=
     { lvl_3_elements, sizeof(lvl_3_elements)/sizeof(level_elem_t), RESOURCE_ID_PDC_LVL_3 },
     { lvl_4_elements, sizeof(lvl_4_elements)/sizeof(level_elem_t), RESOURCE_ID_PDC_LVL_4 },
     { lvl_5_elements, sizeof(lvl_5_elements)/sizeof(level_elem_t), RESOURCE_ID_PDC_LVL_5 },
+    { lvl_6_elements, sizeof(lvl_6_elements)/sizeof(level_elem_t), RESOURCE_ID_PDC_LVL_6 },
 };

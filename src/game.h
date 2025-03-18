@@ -55,11 +55,13 @@ static void gfx_update_proc(Layer* layer, GContext* ctx)
         return;
     }
 
+    graphics_context_set_antialiased(ctx, true);
+
     //Clean the old ball
     //graphics_context_set_fill_color(ctx, GColorRajah);
     graphics_context_set_fill_color(ctx, GColorYellow);
     graphics_fill_rect(ctx,(GRect){
-        .origin= (GPoint){ ball.pos.x-ball.radius-1, ball.pos.y-ball.radius-1 },
+        .origin= (GPoint){ ball.pos.x-ball.radius, ball.pos.y-ball.radius },
         .size= (GSize){ ball.radius*2+ball.stroke, ball.radius*2+ball.stroke }
     }, 0, 0);
 
@@ -94,12 +96,51 @@ static void gfx_update_proc(Layer* layer, GContext* ctx)
 
     if (anim_die_frames < ball.radius)
     {
-        //Draw player ball
-        graphics_context_set_stroke_color(ctx, GColorBlack);
-        graphics_context_set_fill_color(ctx, GColorRed);
-        graphics_context_set_stroke_width(ctx, ball.stroke);
-        graphics_fill_circle(ctx, ball.pos, ball.radius-anim_die_frames);
-        graphics_draw_circle(ctx, ball.pos, ball.radius-anim_die_frames);
+        if (death_by_falling)
+        {
+            //Draw player ball
+player_draw_default:
+            graphics_context_set_stroke_color(ctx, GColorBlack);
+            graphics_context_set_fill_color(ctx, GColorRed);
+            graphics_context_set_stroke_width(ctx, ball.stroke);
+            graphics_fill_circle(ctx, ball.pos, ball.radius-anim_die_frames);
+            graphics_draw_circle(ctx, ball.pos, ball.radius-1-anim_die_frames);
+            graphics_draw_circle(ctx, ball.pos, ball.radius-anim_die_frames);
+        }
+        else
+        {
+            if (anim_die_frames > 0)
+            {
+                graphics_context_set_stroke_color(ctx, GColorBlack);
+                graphics_context_set_fill_color(ctx, GColorLightGray);
+                graphics_context_set_stroke_width(ctx, 1);
+                GPoint shatterball_pos= (GPoint){
+                    .x= ball.pos.x+anim_die_frames*4,
+                    .y= ball.pos.y+anim_die_frames*4
+                };
+                graphics_fill_circle(ctx, shatterball_pos, ball.radius-anim_die_frames);
+                graphics_draw_circle(ctx, shatterball_pos, ball.radius-anim_die_frames);
+                shatterball_pos= (GPoint){
+                    .x= ball.pos.x-anim_die_frames*4,
+                    .y= ball.pos.y+anim_die_frames*4
+                };
+                graphics_fill_circle(ctx, shatterball_pos, ball.radius-anim_die_frames);
+                graphics_draw_circle(ctx, shatterball_pos, ball.radius-anim_die_frames);
+                shatterball_pos= (GPoint){
+                    .x= ball.pos.x-anim_die_frames*4,
+                    .y= ball.pos.y-anim_die_frames*4
+                };
+                graphics_fill_circle(ctx, shatterball_pos, ball.radius-anim_die_frames);
+                graphics_draw_circle(ctx, shatterball_pos, ball.radius-anim_die_frames);
+                shatterball_pos= (GPoint){
+                    .x= ball.pos.x+anim_die_frames*4,
+                    .y= ball.pos.y-anim_die_frames*4
+                };
+                graphics_fill_circle(ctx, shatterball_pos, ball.radius-anim_die_frames);
+                graphics_draw_circle(ctx, shatterball_pos, ball.radius-anim_die_frames);
+            }
+            else goto player_draw_default;
+        }
     }
     else
     {
@@ -171,8 +212,8 @@ static void game_window_load(Window *window)
     layer_set_update_proc(gfx_lyr, (LayerUpdateProc)gfx_update_proc);
 
     ball.pos= (GPoint){.x=PBL_DISPLAY_WIDTH/2, .y=PBL_DISPLAY_HEIGHT/4};
-    ball.radius= 8;
-    ball.stroke= D_STROKE_SZ;
+    ball.radius= 6;
+    ball.stroke= 1;
     ball.mass= 20;
     ball.prev_speed.x= 0;
     ball.prev_speed.y= 0;

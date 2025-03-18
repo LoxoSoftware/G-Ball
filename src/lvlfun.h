@@ -11,18 +11,21 @@ extern Layer*       gfx_lyr;
 extern AppTimer*    render_timer;
 extern AppTimer*    lvlend_anim_timer;
 
-#define D_STROKE_SZ         3
+#define D_STROKE_SZ         1
 
 uint32_t    frames= 0;
 uint32_t    total_frames= 0;
 uint32_t    best_frames= 0;
 short       anim_lvlend_frames= 0;  //Descending
 short       anim_die_frames= 0;     //Ascending
+bool        death_by_falling= false;
 
 static const uint8_t endhole_colors[6]=
 {
-    0b11000010, 0b11000011, 0b11000111,
-    0b11001010, 0b11000111, 0b11000011,
+    // 0b11000010, 0b11000011, 0b11000111,
+    // 0b11001010, 0b11000111, 0b11000011,
+    0b11100011, 0b11010111, 0b11001011,
+    0b11001111, 0b11001011, 0b11010111,
 };
 
 typedef struct
@@ -100,6 +103,7 @@ end_projectile_coll_elem_loop:
 
         if (coll_box2box_check(playa_rect, proj_rect_next, NULL))
         {
+            death_by_falling= false;
             anim_die_frames= 1;
             return;
         }
@@ -108,34 +112,39 @@ end_projectile_coll_elem_loop:
     }
 }
 
-void level_draw(GContext* ctx, level_elem_t lvldata[], int datac, PlayerBall* ball)
+level_elem_t* level_check_switch(level_elem_t lvldata[], int datac, PlayerBall* ball, uint8_t switchid)
 {
-    //Draw projectiles
-    for (uint8_t ip=0; ip<sizeof(projectiles)/sizeof(Projectile); ip++)
+    //Returns NULL if switch is not being stepped on or it doesn't exist
+    // Returns the switch element pointer otherwise
+
+    for (int ie=0; ie<datac; ie++)
     {
-        Projectile t= projectiles[ip];
+        GPoint ent_pos= (GPoint){ .x= lvldata[ie].x, .y= lvldata[ie].y };
+        GSize ent_size= (GSize){ .w= lvldata[ie].w, .h= lvldata[ie].h };
+        GRect ent_rect= { .origin= ent_pos, .size= ent_size };
+        GRect playa_rect= (GRect){
+            .origin= (GPoint){ (*ball).pos.x-(*ball).radius-(*ball).stroke, (*ball).pos.y-(*ball).radius-(*ball).stroke },
+            .size= (GSize){ (*ball).radius*2+(*ball).stroke*2, (*ball).radius*2+(*ball).stroke*2 }
+        };
 
-        if (!t.life)
-            continue;
-
-        GRect ent_rect_prev= { .origin= t.pos, .size= t.size };
-        GRect ent_rect_next= {
-            .origin= {
-                t.pos.x+t.speed.x,
-                t.pos.y+t.speed.y },
-            .size= t.size };
-
-        graphics_context_set_fill_color(ctx, GColorRajah);
-        graphics_fill_rect(ctx, ent_rect_prev, 0, 0);
-        graphics_context_set_fill_color(ctx, GColorBlack);
-        graphics_fill_rect(ctx, ent_rect_next, 0, 0);
-
-        t.pos= ent_rect_next.origin;
-        t.life--;
-
-        projectiles[ip]= t;
+        switch (lvldata[ie].type)
+        {
+            case ent_switch:
+                if (lvldata[ie].switchid != switchid)
+                    continue;
+                if (coll_box2box_check(playa_rect, ent_rect, NULL))
+                    return &lvldata[ie];
+                continue;
+            default:
+                continue;
+        }
     }
 
+    return NULL;
+}
+
+void level_draw(GContext* ctx, level_elem_t lvldata[], int datac, PlayerBall* ball)
+{
     //Draw level elements
     for (int ie=0; ie<datac; ie++)
     {
@@ -150,11 +159,19 @@ void level_draw(GContext* ctx, level_elem_t lvldata[], int datac, PlayerBall* ba
         switch (lvldata[ie].type)
         {
             case ent_end:
+                ent_rect= (GRect){ .origin= {ent_pos.x-11,ent_pos.y-11}, .size= (GSize){24,24} };
                 graphics_context_set_stroke_color(ctx, GColorBlack);
-                graphics_context_set_fill_color(ctx, (GColor){endhole_colors[(frames>>1)%6]});
-                graphics_context_set_stroke_width(ctx, D_STROKE_SZ);
-                graphics_fill_circle(ctx, ent_pos, 12);
-                graphics_draw_circle(ctx, ent_pos, 12);
+                graphics_context_set_fill_color(ctx, (GColor){endhole_colors[(frames/3)%6]});
+                graphics_context_set_stroke_width(ctx, 3);
+                //graphics_draw_circle(ctx, ent_pos, ent_rect.size.h/2);
+                graphics_context_set_stroke_color(ctx, GColorBlack);
+                graphics_draw_circle(ctx, ent_pos, ent_rect.size.w/2);
+                //graphics_context_set_stroke_color(ctx, GColorLightGray);
+                //graphics_draw_arc(ctx, ent_rect, GOvalScaleModeFitCircle, DEG_TO_TRIGANGLE(0+45), DEG_TO_TRIGANGLE(180+45));
+                graphics_context_set_stroke_color(ctx, GColorDarkGray);
+                //graphics_draw_arc(ctx, ent_rect, GOvalScaleModeFitCircle, DEG_TO_TRIGANGLE(180+45), DEG_TO_TRIGANGLE(360+45));
+                graphics_fill_circle(ctx, ent_pos, ent_rect.size.w/2-1);
+                break;
             case ent_hole:
                 if (coll_box2box_check(playa_rect, ent_rect, NULL))
                 {
@@ -221,11 +238,117 @@ void level_draw(GContext* ctx, level_elem_t lvldata[], int datac, PlayerBall* ba
                             break;
                     }
                 }
+                break;
+            case ent_switch:
+                if (coll_box2box_check(playa_rect, ent_rect, NULL))
+                {
+                    graphics_context_set_fill_color(ctx, GColorDarkGreen);
+                    graphics_fill_rect(ctx, ent_rect, 5, GCornersAll);
+                    lvldata[ie].frames++;
+                }
+                else
+                {
+                    graphics_context_set_fill_color(ctx, GColorInchworm);
+                    graphics_fill_rect(ctx, ent_rect, 5, GCornersAll);
+                    graphics_context_set_stroke_color(ctx, GColorBlack);
+                    graphics_context_set_stroke_width(ctx, 1);
+                    ent_rect= (GRect){
+                        .origin= {ent_pos.x+4,ent_pos.y+4},
+                        .size= {ent_size.w-8,ent_size.h-8 } };
+                    graphics_draw_rect(ctx, ent_rect);
+                    lvldata[ie].frames= 0;
+                }
+                break;
+            case ent_swblast:
+                if (lvldata[ie].angle == angle_facingDown || lvldata[ie].angle == angle_facingUp)
+                    ent_rect= (GRect){ .origin= ent_pos, .size= { 8, 16 } };
+                else
+                    ent_rect= (GRect){ .origin= ent_pos, .size= { 16, 8 } };
+
+                level_elem_t* target_switch= level_check_switch(lvldata, datac, ball, lvldata[ie].switchid);
+
+                if (!target_switch)
+                    graphics_context_set_fill_color(ctx, GColorIslamicGreen);
+                else
+                    graphics_context_set_fill_color(ctx, GColorRed);
+                graphics_context_set_stroke_color(ctx, GColorBlack);
+                graphics_context_set_stroke_width(ctx, D_STROKE_SZ);
+                graphics_fill_rect(ctx, ent_rect, 0, 0);
+                graphics_draw_rect(ctx, ent_rect);
+
+                if (target_switch) if ((*target_switch).frames%lvldata[ie].interval == 1)
+                {
+                    //Spawn a projectile
+                    graphics_context_set_fill_color(ctx, GColorChromeYellow);
+                    graphics_fill_rect(ctx, ent_rect, 0, 0);
+
+                    //Find an empty spot in the projectlies array
+                    int16_t prj_id= -1;
+                    for (uint8_t ip=0; ip<sizeof(projectiles)/sizeof(Projectile); ip++)
+                        if (!projectiles[ip].life)
+                        {
+                            prj_id= ip;
+                            break;
+                        }
+                    if (prj_id < 0) continue;
+
+                    projectiles[prj_id].life= 180;
+                    projectiles[prj_id].size= ent_rect.size;
+                    switch (lvldata[ie].angle)
+                    {
+                        case angle_facingUp:
+                            projectiles[prj_id].pos= (GPoint){ ent_pos.x, ent_pos.y-8};
+                            projectiles[prj_id].speed= (GPoint){ 0, -1 };
+                            break;
+                        case angle_facingDown:
+                            projectiles[prj_id].pos= (GPoint){ ent_pos.x, ent_pos.y+8};
+                            projectiles[prj_id].speed= (GPoint){ 0, 1 };
+                            break;
+                        case angle_facingLeft:
+                            projectiles[prj_id].pos= (GPoint){ ent_pos.x-8, ent_pos.y};
+                            projectiles[prj_id].speed= (GPoint){ -1, 0 };
+                            break;
+                        case angle_facingRight:
+                            projectiles[prj_id].pos= (GPoint){ ent_pos.x+8, ent_pos.y};
+                            projectiles[prj_id].speed= (GPoint){ 1, 0 };
+                            break;
+                        default:
+                            projectiles[prj_id].life= 0;
+                            break;
+                    }
+                }
+                break;
             default:
                 // graphics_context_set_fill_color(ctx, GColorRed);
                 // graphics_fill_rect(ctx, ent_rect, 0, 0);
                 continue;
         }
+    }
+
+    //Draw projectiles
+    for (uint8_t ip=0; ip<sizeof(projectiles)/sizeof(Projectile); ip++)
+    {
+        Projectile t= projectiles[ip];
+
+        if (!t.life)
+            continue;
+
+        GRect ent_rect_prev= { .origin= t.pos, .size= t.size };
+        GRect ent_rect_next= {
+            .origin= {
+                t.pos.x+t.speed.x,
+                t.pos.y+t.speed.y },
+            .size= t.size };
+
+        graphics_context_set_fill_color(ctx, GColorRajah);
+        graphics_fill_rect(ctx, ent_rect_prev, 0, 0);
+        graphics_context_set_fill_color(ctx, GColorBlack);
+        graphics_fill_rect(ctx, ent_rect_next, 0, 0);
+
+        t.pos= ent_rect_next.origin;
+        t.life--;
+
+        projectiles[ip]= t;
     }
 }
 
@@ -284,6 +407,8 @@ void level_collide(PlayerBall* ball, level_elem_t lvldata[], int datac)
                 coll_playa_handle(ball, &ent_rect);
                 break;
             case ent_end:
+                ent_rect= (GRect){  .origin= (GPoint){ent_pos.x-4, ent_pos.y-4},
+                                    .size= (GSize){8, 8} };
                 if (coll_box2box_check(playa_rect, ent_rect, NULL))
                 {
                     anim_lvlend_frames= 24;
@@ -297,6 +422,7 @@ void level_collide(PlayerBall* ball, level_elem_t lvldata[], int datac)
 
                 if (coll_box2box_check(playa_rect, ent_rect_small, NULL))
                 {
+                    death_by_falling= true;
                     anim_die_frames= 1;
                     //psleep(1000);
                     //level_load(ball, CURRENT_LEVEL.lvlptr, CURRENT_LEVEL.lvl_datac, false);

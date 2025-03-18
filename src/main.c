@@ -72,7 +72,7 @@ static void title_gfx(Layer* layer, GContext* ctx)
         GTextOverflowModeWordWrap, GTextAlignmentRight, NULL);
 
     graphics_context_set_text_color(ctx, GColorBlack);
-    graphics_draw_text(ctx, "v1.0 - (c) Loxo Software",
+    graphics_draw_text(ctx, "v1.1 - (c) Loxo Software",
         fonts_get_system_font(FONT_KEY_GOTHIC_14),
         (GRect){(GPoint){ 2,PBL_DISPLAY_HEIGHT-footer_h-16}, (GSize){PBL_DISPLAY_WIDTH,24}},
         GTextOverflowModeWordWrap, GTextAlignmentLeft, NULL);
